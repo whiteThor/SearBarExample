@@ -4,24 +4,35 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
+import com.thoughtbot.expandablerecyclerview.models.ExpandableList;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import musicmachine.sanples.android.ruben.com.searbarexample.ArrayItem;
 import musicmachine.sanples.android.ruben.com.searbarexample.R;
 import musicmachine.sanples.android.ruben.com.searbarexample.model.Actor;
 import musicmachine.sanples.android.ruben.com.searbarexample.model.Category;
 import musicmachine.sanples.android.ruben.com.searbarexample.viewHolder.ActorViewHolder;
 import musicmachine.sanples.android.ruben.com.searbarexample.viewHolder.CategoryViewHolder;
 
-public class RecyclerAdapter extends ExpandableRecyclerViewAdapter<CategoryViewHolder, ActorViewHolder>{
+public class RecyclerAdapter extends ExpandableRecyclerViewAdapter<CategoryViewHolder, ActorViewHolder> implements Filterable{
 
     private Activity mActivity;
+    ArrayList<Category> listData;
+    ArrayList<Category> listFiltered;
+    ArrayList<Actor> listFilteredAct;
+
     public RecyclerAdapter(Activity activity, List<? extends ExpandableGroup> groups) {
         super(groups);
         mActivity = activity;
+        listData = (ArrayList<Category> )groups;
     }
 
     @Override
@@ -50,5 +61,47 @@ public class RecyclerAdapter extends ExpandableRecyclerViewAdapter<CategoryViewH
     public void onBindGroupViewHolder(CategoryViewHolder holder, int flatPosition, ExpandableGroup group) {
         holder.setGroupName(group);
 
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String charString = constraint.toString();
+                if(charString.isEmpty()){
+                    listData =  ArrayItem.getData();
+
+                }else{
+
+                    listFiltered = new ArrayList<>();
+
+                    for (Category row : ArrayItem.getData()) {
+                        listFilteredAct = new ArrayList<>();
+                        for (Actor actor: row.getItems() ) {
+                            if(actor.getName().contains(charString)){
+                                listFilteredAct.add(actor);
+                            }
+                        }
+                        listFiltered.add(new Category(row.getTitle(), listFilteredAct));
+                    }
+                    listData = listFiltered;
+
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = listData;
+
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                RecyclerAdapter.super.expandableList =new ExpandableList( (ArrayList<Category>) results.values);
+                        //listData = (ArrayList<Category>) results.values;
+                notifyDataSetChanged();
+//                notifyAll();
+
+            }
+        };
     }
 }

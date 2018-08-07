@@ -27,15 +27,16 @@ public class CategoryViewHolder extends GroupViewHolder {
     @Override
     public void expand() {
         Log.d(TAG, "Expand");
+        mCatName.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.up_arrow,0);
 
-        mCatName.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.down_arrow,0);
+
 
     }
 
     @Override
     public void collapse() {
         Log.d(TAG, "Collapse");
-        mCatName.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.up_arrow,0);
+        mCatName.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.down_arrow,0);
 
     }
 }

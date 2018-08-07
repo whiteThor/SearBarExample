@@ -20,7 +20,7 @@ import musicmachine.sanples.android.ruben.com.searbarexample.adapter.RecyclerAda
 import musicmachine.sanples.android.ruben.com.searbarexample.model.Actor;
 import musicmachine.sanples.android.ruben.com.searbarexample.model.Category;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, android.widget.SearchView.OnCloseListener{
 
     private Toolbar mTbMainSearch;
     private RecyclerView mRvToolbarSearch;
@@ -36,7 +36,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mTbMainSearch = findViewById(R.id.toolBarSearch);
         mRvToolbarSearch = findViewById(R.id.listRecycleView);
         mCategories = new ArrayList<>();
-        setData();
+
+        mCategories = ArrayItem.getData();
 
         mRvToolbarSearch.setLayoutManager(new LinearLayoutManager(this));
         mAdapter  = new RecyclerAdapter(this,mCategories);
@@ -53,15 +54,32 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.d(TAG, "OnQueryTextSymmit: Query->" + query);
-      //  mAdapter.getFilter().filter(query);
-        return true;
+     //   mAdapter.getFilter().filter(query);
+        return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
         Log.d(TAG, "OnQueryTextChange: Query->" + newText);
+        ArrayList<Category> listFiltered;
+        ArrayList<Actor> listFilteredAct;
+
+        listFiltered = new ArrayList<>();
+
+        for (Category row : ArrayItem.getData()) {
+            listFilteredAct = new ArrayList<>();
+            for (Actor actor: row.getItems() ) {
+                if(actor.getName().contains(newText)){
+                    listFilteredAct.add(actor);
+                }
+            }
+            listFiltered.add(new Category(row.getTitle(), listFilteredAct));
+        }
+        mAdapter  = new RecyclerAdapter(this,listFiltered);
+        mRvToolbarSearch.setAdapter(mAdapter);
      //   mAdapter.getFilter().filter(newText);
-        return true;
+
+        return false;
     }
 
     @Override
@@ -80,39 +98,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         return true;
     }
 
-    private void setData() {
-        ArrayList<Actor> drama = new ArrayList<>();
-        drama.add(new Actor("Tom Hardy",  "(541) 754-3010", "https://api.androidhive.info/json/images/tom_hardy.jpg"));
-        drama.add(new Actor("Johnny Depp", "(452) 839-1210", "htps://api.androidhive.info/json/images/johnny.jpg"));
-        drama.add(new Actor("Keira Knightley", "(535) 324-4334", "https://api.androidhive.info/json/images/keira.jpg"));
-        drama.add(new Actor("Leonardo DiCaprio", "(564) 333-2452", "https://api.androidhive.info/json/images/leonardo.jpg"));
-        drama.add(new Actor("Brad Pitt", "(567) 754-8945", "https://api.androidhive.info/json/images/brad.jpg"));
-        drama.add(new Actor("Angelina Jolie", "(324) 754-5433", "https://api.androidhive.info/json/images/angelina.jpg"));
-        drama.add(new Actor("Kate Winslet", "(788) 343-3433", "https://api.androidhive.info/json/images/kate.jpg"));
-        drama.add(new Actor("Christian Bale", "(865) 755-3555", "https://api.androidhive.info/json/images/christian.jpg"));
-        drama.add(new Actor("Morgan Freeman", "(445) 776-9076", "https://api.androidhive.info/json/images/morgan.jpg"));
-        drama.add(new Actor("Scarlett Johanssonn", "(545) 454-2567", "https://api.androidhive.info/json/images/scarlett.jpg"));
 
 
-        ArrayList<Actor> accion = new ArrayList<>();
-        drama.add(new Actor("Tom Cruise",  "(541) 453-2311", "https://api.androidhive.info/json/images/tom_cruise.jpg"));
-        drama.add(new Actor("Robert De Niro",  "(767) 544-8867", "https://api.androidhive.info/json/images/robert_de.jpg"));
-        drama.add(new Actor("Russell Crowe",  "(234) 234-3321", "https://api.androidhive.info/json/images/russell.jpg"));
-        drama.add(new Actor("Keanu Reeves",  "(454) 455-5445", "https://api.androidhive.info/json/images/keanu.jpg"));
-        drama.add(new Actor("Robert Downey Jr.",  "(444) 444-4444", "https://api.androidhive.info/json/images/robert.jpg"));
+    @Override
+    public boolean onClose() {
+        mAdapter.getFilter().filter("");
 
-
-
-        ArrayList<Actor> comedia = new ArrayList<>();
-        drama.add(new Actor("Will Smith",  "(541) 879-3453", "https://api.androidhive.info/json/images/will.jpg"));
-        drama.add(new Actor("Hugh Jackman",  "(544) 454-4544", "https://api.androidhive.info/json/images/hugh.jpg"));
-        drama.add(new Actor("Tom Hanks",  "(541) 454-4544", "https://api.androidhive.info/json/images/tom.jpg"));
-
-        mCategories.add(new Category("Drama",drama));
-        mCategories.add(new Category("Accion",accion));
-        mCategories.add(new Category("Comedia",comedia));
-
-
-
+        return false;
     }
+
+
 }
